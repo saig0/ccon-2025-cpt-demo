@@ -1,0 +1,13 @@
+
+
+logging:
+  level:
+    root: info
+    io:
+      camunda:
+        process:
+          test: info
+    # Hide default logging from Testcontainers
+    org:
+      testcontainers: warn
+    tc: error
