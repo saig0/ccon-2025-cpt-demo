@@ -9,4 +9,6 @@ public interface AccountService {
   Account createAccount(SignUpForm signUpForm) throws AccountServiceException;
 
   void activateAccount(Account account);
+
+  void deleteAccount(Account account);
 }

@@ -33,4 +33,9 @@ public class AccountServiceImpl implements AccountService {
   public void activateAccount(final Account account) {
     LOG.debug("Account activated. [id={}]", account.id());
   }
+
+  @Override
+  public void deleteAccount(final Account account) {
+    LOG.debug("Account deleted. [id={}]", account.id());
+  }
 }

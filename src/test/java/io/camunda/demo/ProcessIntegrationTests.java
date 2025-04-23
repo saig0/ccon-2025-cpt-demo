@@ -12,6 +12,8 @@ import io.camunda.demo.services.BackendService;
 import io.camunda.demo.services.SubscriptionService;
 import io.camunda.process.test.api.CamundaProcessTestContext;
 import io.camunda.process.test.api.CamundaSpringProcessTest;
+import java.time.Duration;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,8 +30,9 @@ class ProcessIntegrationTests {
   @MockitoBean private BackendService backendService;
   @MockitoBean private SubscriptionService subscriptionService;
 
+  @DisplayName("Should create account and subscribe to newsletter")
   @Test
-  void shouldCreateAccount() {
+  void shouldCreateAccountWithSubscription() {
     // given
     final var signUpForm = new SignUpForm("Demo", "demo@camunda.com", true);
     final var account =
@@ -85,8 +88,9 @@ class ProcessIntegrationTests {
     verify(subscriptionService).subscribeAccount(account);
   }
 
+  @DisplayName("Should create account without subscribing to newsletter")
   @Test
-  void shouldCreateAccountNoSubscription() {
+  void shouldCreateAccountWithoutSubscription() {
     // given
     final var signUpForm = new SignUpForm("Demo", "demo@camunda.com", false);
     final var account =
@@ -128,6 +132,47 @@ class ProcessIntegrationTests {
 
     // verify mock invocations
     verify(subscriptionService, never()).subscribeAccount(account);
+  }
+
+  @DisplayName("Should delete account if no confirmation is received")
+  @Test
+  void shouldDeleteAccountNoConfirmation() {
+    // given
+    final var signUpForm = new SignUpForm("Demo", "demo@camunda.com", true);
+    final var account =
+        new Account(
+            "id-1",
+            signUpForm.userName(),
+            signUpForm.email(),
+            signUpForm.subscribeToNewsletter(),
+            "code-1");
+
+    when(accountService.createAccount(signUpForm)).thenReturn(account);
+
+    mockJobWorker("io.camunda:sendgrid:1");
+
+    final var processInstance =
+        client
+            .newCreateInstanceCommand()
+            .bpmnProcessId("sign-up")
+            .latestVersion()
+            .variable("signUpForm", signUpForm)
+            .send()
+            .join();
+
+    // when
+    assertThat(processInstance).isActive().hasCompletedElements(byName("Send confirmation"));
+
+    processTestContext.increaseTime(Duration.ofDays(3));
+
+    // then
+    assertThat(processInstance)
+        .isCompleted()
+        .hasCompletedElements(
+            byName("3 days"), byName("Delete account"), byName("Account deleted"));
+
+    // verify mock invocations
+    verify(accountService).deleteAccount(account);
   }
 
   private void mockJobWorker(final String jobType) {
