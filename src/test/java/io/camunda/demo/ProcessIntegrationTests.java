@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 
 import io.camunda.client.CamundaClient;
 import io.camunda.demo.model.Account;
-import io.camunda.demo.model.UserSignUp;
+import io.camunda.demo.model.SignUpForm;
 import io.camunda.demo.services.AccountService;
 import io.camunda.process.test.api.CamundaProcessTestContext;
 import io.camunda.process.test.api.CamundaSpringProcessTest;
@@ -27,25 +27,36 @@ class ProcessIntegrationTests {
   @Test
   void happyPath() {
     // given
-    final var signUp = new UserSignUp( "Demo", "demo@camunda.com", true);
-    final Account account = new Account("id-1", "Demo", "demo@camunda.com", true, "code-1");
+    final var signUpForm = new SignUpForm("Demo", "demo@camunda.com", true);
+    final var account = new Account("id-1", "Demo", "demo@camunda.com", true, "code-1");
 
-    when(accountService.createAccount(signUp)).thenReturn(account);
+    when(accountService.createAccount(signUpForm)).thenReturn(account);
+
+    mockJobWorker("io.camunda:sendgrid:1");
 
     final var processInstance =
         client
             .newCreateInstanceCommand()
             .bpmnProcessId("sign-up")
             .latestVersion()
-            .variable("signUp", signUp)
+            .variable("signUpForm", signUpForm)
             .send()
             .join();
 
     // when
 
     // then
-    assertThat(processInstance).isActive()
-            .hasCompletedElements(byName("Create account"))
-            .hasActiveElements(byName("Send activation email"));
+    assertThat(processInstance)
+        .isActive()
+        .hasCompletedElements(byName("Create account"), byName("Send activation email"))
+        .hasActiveElements(byName("Send confirmation"))
+        .hasVariable("account", account);
+  }
+
+  private void mockJobWorker(final String jobType) {
+    client
+        .newWorker()
+        .jobType(jobType)
+        .handler((jobClient, job) -> jobClient.newCompleteCommand(job.getKey()).send()).open();
   }
 }

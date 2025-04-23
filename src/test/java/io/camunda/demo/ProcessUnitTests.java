@@ -1,16 +1,12 @@
 package io.camunda.demo;
 
 import io.camunda.client.CamundaClient;
-import io.camunda.demo.model.Account;
-import io.camunda.demo.model.UserSignUp;
+import io.camunda.demo.model.SignUpForm;
 import io.camunda.process.test.api.CamundaProcessTestContext;
 import io.camunda.process.test.api.CamundaSpringProcessTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.Collections;
-import java.util.Map;
 
 import static io.camunda.process.test.api.CamundaAssert.assertThat;
 import static io.camunda.process.test.api.assertions.ElementSelectors.byName;
@@ -28,7 +24,7 @@ class ProcessUnitTests {
   @Test
   void happyPath() {
     // given
-    final var signUp = new UserSignUp( "Demo", "demo@camunda.com", true);
+    final var signUp = new SignUpForm( "Demo", "demo@camunda.com", true);
 
     final var processInstance =
         client

@@ -2,7 +2,7 @@ package io.camunda.demo.workers;
 
 import io.camunda.client.api.response.ActivatedJob;
 import io.camunda.demo.model.Account;
-import io.camunda.demo.model.UserSignUp;
+import io.camunda.demo.model.SignUpForm;
 import io.camunda.demo.services.AccountService;
 import io.camunda.spring.client.annotation.JobWorker;
 import io.camunda.spring.client.annotation.Variable;
@@ -20,8 +20,8 @@ public class CreateAccountWorker {
     }
 
     @JobWorker(type = "accounts:create")
-    public Map<String, Object> handleJob(final ActivatedJob job, @Variable("signUp") UserSignUp userSignUp) {
-        final Account account = accountService.createAccount(userSignUp);
+    public Map<String, Object> handleJob(final ActivatedJob job, @Variable("signUpForm") SignUpForm signUpForm) {
+        final Account account = accountService.createAccount(signUpForm);
         return Map.of("account", account);
     }
 }
