@@ -2,8 +2,7 @@ package io.camunda.demo;
 
 import static io.camunda.process.test.api.CamundaAssert.assertThat;
 import static io.camunda.process.test.api.assertions.ElementSelectors.byName;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import io.camunda.client.CamundaClient;
 import io.camunda.demo.model.Account;
@@ -30,7 +29,7 @@ class ProcessIntegrationTests {
   @MockitoBean private SubscriptionService subscriptionService;
 
   @Test
-  void happyPath() {
+  void shouldCreateAccount() {
     // given
     final var signUpForm = new SignUpForm("Demo", "demo@camunda.com", true);
     final var account =
@@ -72,7 +71,7 @@ class ProcessIntegrationTests {
 
     // then
     assertThat(processInstance)
-        .isActive()
+        .isCompleted()
         .hasCompletedElements(
             byName("Email confirmed"),
             byName("Activate account"),
@@ -84,6 +83,51 @@ class ProcessIntegrationTests {
     verify(backendService).confirmAccount(account);
     verify(accountService).activateAccount(account);
     verify(subscriptionService).subscribeAccount(account);
+  }
+
+  @Test
+  void shouldCreateAccountNoSubscription() {
+    // given
+    final var signUpForm = new SignUpForm("Demo", "demo@camunda.com", false);
+    final var account =
+        new Account(
+            "id-1",
+            signUpForm.userName(),
+            signUpForm.email(),
+            signUpForm.subscribeToNewsletter(),
+            "code-1");
+
+    when(accountService.createAccount(signUpForm)).thenReturn(account);
+
+    mockJobWorker("io.camunda:sendgrid:1");
+
+    final var processInstance =
+        client
+            .newCreateInstanceCommand()
+            .bpmnProcessId("sign-up")
+            .latestVersion()
+            .variable("signUpForm", signUpForm)
+            .send()
+            .join();
+
+    // when
+    assertThat(processInstance).isActive().hasCompletedElements(byName("Send confirmation"));
+
+    client
+        .newPublishMessageCommand()
+        .messageName("backend:email-confirmed")
+        .correlationKey(account.id())
+        .send()
+        .join();
+
+    // then
+    assertThat(processInstance)
+        .isCompleted()
+        .hasCompletedElements(byName("Account created"))
+        .hasNotActivatedElements(byName("Subscribe to newsletter"));
+
+    // verify mock invocations
+    verify(subscriptionService, never()).subscribeAccount(account);
   }
 
   private void mockJobWorker(final String jobType) {
