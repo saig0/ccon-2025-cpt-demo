@@ -27,6 +27,11 @@ class ProcessIntegrationTests {
 
   private static final String PROCESS_ID = "sign-up";
 
+  private static final String USER_NAME = "Demo";
+  private static final String EMAIL = "demo@camunda.com";
+  private static final String ACCOUNT_ID = "account-id-0001";
+  private static final String ACTIVATION_CODE = "activation-code-0001";
+
   @Autowired private CamundaClient client;
   @Autowired private CamundaProcessTestContext processTestContext;
 
@@ -38,17 +43,10 @@ class ProcessIntegrationTests {
   @Test
   void shouldCreateAccountWithSubscription() {
     // given
-    final var signUpForm = new SignUpForm("Demo", "demo@camunda.com", true);
-    final var account =
-        new Account(
-            "id-1",
-            signUpForm.userName(),
-            signUpForm.email(),
-            signUpForm.subscribeToNewsletter(),
-            "code-1");
+    final var signUpForm = new SignUpForm(USER_NAME, EMAIL, true);
+    final var account = new Account(ACCOUNT_ID, USER_NAME, EMAIL, true, ACTIVATION_CODE);
 
     when(accountService.createAccount(signUpForm)).thenReturn(account);
-
     mockJobWorker("io.camunda:sendgrid:1");
 
     final var processInstance = createProcessInstance(signUpForm);
@@ -90,17 +88,10 @@ class ProcessIntegrationTests {
   @Test
   void shouldCreateAccountWithoutSubscription() {
     // given
-    final var signUpForm = new SignUpForm("Demo", "demo@camunda.com", false);
-    final var account =
-        new Account(
-            "id-1",
-            signUpForm.userName(),
-            signUpForm.email(),
-            signUpForm.subscribeToNewsletter(),
-            "code-1");
+    final var signUpForm = new SignUpForm(USER_NAME, EMAIL, false);
+    final var account = new Account(ACCOUNT_ID, USER_NAME, EMAIL, false, ACTIVATION_CODE);
 
     when(accountService.createAccount(signUpForm)).thenReturn(account);
-
     mockJobWorker("io.camunda:sendgrid:1");
 
     final var processInstance = createProcessInstance(signUpForm);
@@ -129,17 +120,10 @@ class ProcessIntegrationTests {
   @Test
   void shouldDeleteAccountNoConfirmation() {
     // given
-    final var signUpForm = new SignUpForm("Demo", "demo@camunda.com", true);
-    final var account =
-        new Account(
-            "id-1",
-            signUpForm.userName(),
-            signUpForm.email(),
-            signUpForm.subscribeToNewsletter(),
-            "code-1");
+    final var signUpForm = new SignUpForm(USER_NAME, EMAIL, true);
+    final var account = new Account(ACCOUNT_ID, USER_NAME, EMAIL, true, ACTIVATION_CODE);
 
     when(accountService.createAccount(signUpForm)).thenReturn(account);
-
     mockJobWorker("io.camunda:sendgrid:1");
 
     final var processInstance = createProcessInstance(signUpForm);
@@ -163,16 +147,15 @@ class ProcessIntegrationTests {
   @Test
   void shouldRejectSignUp() {
     // given
-    final var signUpForm = new SignUpForm("Demo", "demo@camunda.com", true);
-
+    final var signUpForm = new SignUpForm(USER_NAME, EMAIL, true);
     final String rejectionReason = "Email address is already used by a different account";
+
     doThrow(new AccountServiceException(rejectionReason))
         .when(accountService)
         .createAccount(signUpForm);
 
-    final var processInstance = createProcessInstance(signUpForm);
-
     // when
+    final var processInstance = createProcessInstance(signUpForm);
 
     // then
     assertThat(processInstance)

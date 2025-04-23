@@ -44,7 +44,7 @@
       <bpmn:incoming>Flow_0k166vt</bpmn:incoming>
       <bpmn:outgoing>Flow_1beehtz</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:eventBasedGateway id="Gateway_18mnomf">
+    <bpmn:eventBasedGateway id="await-confirmation" name="Await confirmation">
       <bpmn:incoming>Flow_1beehtz</bpmn:incoming>
       <bpmn:outgoing>Flow_1g91kzd</bpmn:outgoing>
       <bpmn:outgoing>Flow_05w8gl5</bpmn:outgoing>
@@ -120,9 +120,9 @@
     <bpmn:sequenceFlow id="Flow_11c441k" sourceRef="new-sign-up" targetRef="create-account" />
     <bpmn:sequenceFlow id="Flow_18dxxx3" sourceRef="create-account" targetRef="snd-activation-email" />
     <bpmn:sequenceFlow id="Flow_0k166vt" sourceRef="snd-activation-email" targetRef="send-confirmation" />
-    <bpmn:sequenceFlow id="Flow_1beehtz" sourceRef="send-confirmation" targetRef="Gateway_18mnomf" />
-    <bpmn:sequenceFlow id="Flow_1g91kzd" sourceRef="Gateway_18mnomf" targetRef="message-email-confirmed" />
-    <bpmn:sequenceFlow id="Flow_05w8gl5" sourceRef="Gateway_18mnomf" targetRef="timer-three-days" />
+    <bpmn:sequenceFlow id="Flow_1beehtz" sourceRef="send-confirmation" targetRef="await-confirmation" />
+    <bpmn:sequenceFlow id="Flow_1g91kzd" sourceRef="await-confirmation" targetRef="message-email-confirmed" />
+    <bpmn:sequenceFlow id="Flow_05w8gl5" sourceRef="await-confirmation" targetRef="timer-three-days" />
     <bpmn:sequenceFlow id="Flow_09q0ng0" sourceRef="message-email-confirmed" targetRef="activate-account" />
     <bpmn:sequenceFlow id="Flow_0e9owv1" sourceRef="activate-account" targetRef="Gateway_1c3noxs" />
     <bpmn:sequenceFlow id="Flow_17ggsvh" name="Yes" sourceRef="Gateway_1c3noxs" targetRef="subscribe-to-newsletter" />
@@ -159,8 +159,11 @@
       <bpmndi:BPMNShape id="Activity_1hkslz1_di" bpmnElement="send-confirmation">
         <dc:Bounds x="560" y="148" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_1ya5xfn_di" bpmnElement="Gateway_18mnomf">
+      <bpmndi:BPMNShape id="Gateway_1ya5xfn_di" bpmnElement="await-confirmation">
         <dc:Bounds x="705" y="163" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="686" y="133" width="90" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0ka3sqg_di" bpmnElement="message-email-confirmed">
         <dc:Bounds x="802" y="170" width="36" height="36" />
