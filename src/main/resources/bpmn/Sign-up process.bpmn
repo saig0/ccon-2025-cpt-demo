@@ -22,7 +22,7 @@
         <zeebe:ioMapping>
           <zeebe:input source="{{secrets.SEND_GRID_API_KEY}}" target="apiKey" />
           <zeebe:input source="Camunda" target="from.name" />
-          <zeebe:input source="demo@camunda.com" target="from.email" />
+          <zeebe:input source="philipp.ossler@camunda.com" target="from.email" />
           <zeebe:input source="=account.userName" target="to.name" />
           <zeebe:input source="=account.email" target="to.email" />
           <zeebe:input source="mail" target="unMappedFieldNotUseInModel.mailType" />

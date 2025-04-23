@@ -6,6 +6,7 @@ import io.camunda.demo.model.SignUpForm;
 
 public interface AccountService {
 
-    Account createAccount(SignUpForm signUpForm) throws AccountServiceException;
+  Account createAccount(SignUpForm signUpForm) throws AccountServiceException;
 
+  void activateAccount(Account account);
 }

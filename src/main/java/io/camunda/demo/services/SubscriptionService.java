@@ -1,3 +1,8 @@
 package io.camunda.demo.services;
 
-public interface SubscriptionService {}
+import io.camunda.demo.model.Account;
+
+public interface SubscriptionService {
+
+  void subscribeAccount(Account account);
+}

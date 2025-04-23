@@ -1,3 +1,9 @@
 package io.camunda.demo.services;
 
-public interface BackendService {}
+import io.camunda.demo.model.Account;
+
+public interface BackendService {
+
+    void confirmAccount(Account account);
+
+}
