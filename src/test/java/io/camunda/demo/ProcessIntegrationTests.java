@@ -56,7 +56,7 @@ class ProcessIntegrationTests {
         .isActive()
         .hasCompletedElements(byName("Create account"))
         .hasVariable("account", account)
-        .hasActiveElements(byName("Await confirmation"));
+        .hasActiveElements(byName("Await email activation"));
 
     client
         .newPublishMessageCommand()
@@ -98,7 +98,7 @@ class ProcessIntegrationTests {
     final var processInstance = createProcessInstance(signUpForm);
 
     // when
-    assertThat(processInstance).isActive().hasActiveElements(byName("Await confirmation"));
+    assertThat(processInstance).isActive().hasActiveElements(byName("Await email activation"));
 
     client
         .newPublishMessageCommand()
@@ -130,7 +130,7 @@ class ProcessIntegrationTests {
     final var processInstance = createProcessInstance(signUpForm);
 
     // when
-    assertThat(processInstance).isActive().hasActiveElements(byName("Await confirmation"));
+    assertThat(processInstance).isActive().hasActiveElements(byName("Await email activation"));
 
     processTestContext.increaseTime(Duration.ofDays(3));
 
