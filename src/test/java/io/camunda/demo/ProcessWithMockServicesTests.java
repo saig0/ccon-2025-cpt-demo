@@ -23,7 +23,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest
 @CamundaSpringProcessTest
-class ProcessIntegrationTests {
+class ProcessWithMockServicesTests {
 
   private static final String PROCESS_ID = "sign-up";
 
