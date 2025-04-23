@@ -54,12 +54,9 @@ class ProcessIntegrationTests {
     // when
     assertThat(processInstance)
         .isActive()
-        .hasCompletedElements(
-            byName("New sign-up"),
-            byName("Create account"),
-            byName("Send activation email"),
-            byName("Send confirmation"))
-        .hasVariable("account", account);
+        .hasCompletedElements(byName("Create account"))
+        .hasVariable("account", account)
+        .hasActiveElements(byName("Await confirmation"));
 
     client
         .newPublishMessageCommand()
@@ -71,7 +68,11 @@ class ProcessIntegrationTests {
     // then
     assertThat(processInstance)
         .isCompleted()
-        .hasCompletedElements(
+        .hasCompletedElementsInOrder(
+            byName("New sign-up"),
+            byName("Create account"),
+            byName("Send activation email"),
+            byName("Send confirmation"),
             byName("Email confirmed"),
             byName("Activate account"),
             byName("Subscribe to newsletter"),
@@ -97,7 +98,7 @@ class ProcessIntegrationTests {
     final var processInstance = createProcessInstance(signUpForm);
 
     // when
-    assertThat(processInstance).isActive().hasCompletedElements(byName("Send confirmation"));
+    assertThat(processInstance).isActive().hasActiveElements(byName("Await confirmation"));
 
     client
         .newPublishMessageCommand()
@@ -129,14 +130,14 @@ class ProcessIntegrationTests {
     final var processInstance = createProcessInstance(signUpForm);
 
     // when
-    assertThat(processInstance).isActive().hasCompletedElements(byName("Send confirmation"));
+    assertThat(processInstance).isActive().hasActiveElements(byName("Await confirmation"));
 
     processTestContext.increaseTime(Duration.ofDays(3));
 
     // then
     assertThat(processInstance)
         .isCompleted()
-        .hasCompletedElements(
+        .hasCompletedElementsInOrder(
             byName("3 days"), byName("Delete account"), byName("Account deleted"));
 
     // verify mock invocations
@@ -161,7 +162,7 @@ class ProcessIntegrationTests {
     assertThat(processInstance)
         .isCompleted()
         .hasTerminatedElements(byName("Create account"))
-        .hasCompletedElements(byName("Send rejection"), byName("Sign-up rejected"));
+        .hasCompletedElementsInOrder(byName("Send rejection"), byName("Sign-up rejected"));
 
     // verify mock invocations
     verify(backendService).sendRejection(signUpForm, rejectionReason);
