@@ -5,6 +5,7 @@ import static io.camunda.process.test.api.assertions.ElementSelectors.byName;
 import static org.mockito.Mockito.*;
 
 import io.camunda.client.CamundaClient;
+import io.camunda.client.api.response.ProcessInstanceEvent;
 import io.camunda.demo.model.Account;
 import io.camunda.demo.model.AccountServiceException;
 import io.camunda.demo.model.SignUpForm;
@@ -23,6 +24,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest
 @CamundaSpringProcessTest
 class ProcessIntegrationTests {
+
+  private static final String PROCESS_ID = "sign-up";
 
   @Autowired private CamundaClient client;
   @Autowired private CamundaProcessTestContext processTestContext;
@@ -48,14 +51,7 @@ class ProcessIntegrationTests {
 
     mockJobWorker("io.camunda:sendgrid:1");
 
-    final var processInstance =
-        client
-            .newCreateInstanceCommand()
-            .bpmnProcessId("sign-up")
-            .latestVersion()
-            .variable("signUpForm", signUpForm)
-            .send()
-            .join();
+    final var processInstance = createProcessInstance(signUpForm);
 
     // when
     assertThat(processInstance)
@@ -107,14 +103,7 @@ class ProcessIntegrationTests {
 
     mockJobWorker("io.camunda:sendgrid:1");
 
-    final var processInstance =
-        client
-            .newCreateInstanceCommand()
-            .bpmnProcessId("sign-up")
-            .latestVersion()
-            .variable("signUpForm", signUpForm)
-            .send()
-            .join();
+    final var processInstance = createProcessInstance(signUpForm);
 
     // when
     assertThat(processInstance).isActive().hasCompletedElements(byName("Send confirmation"));
@@ -153,14 +142,7 @@ class ProcessIntegrationTests {
 
     mockJobWorker("io.camunda:sendgrid:1");
 
-    final var processInstance =
-        client
-            .newCreateInstanceCommand()
-            .bpmnProcessId("sign-up")
-            .latestVersion()
-            .variable("signUpForm", signUpForm)
-            .send()
-            .join();
+    final var processInstance = createProcessInstance(signUpForm);
 
     // when
     assertThat(processInstance).isActive().hasCompletedElements(byName("Send confirmation"));
@@ -188,14 +170,7 @@ class ProcessIntegrationTests {
         .when(accountService)
         .createAccount(signUpForm);
 
-    final var processInstance =
-        client
-            .newCreateInstanceCommand()
-            .bpmnProcessId("sign-up")
-            .latestVersion()
-            .variable("signUpForm", signUpForm)
-            .send()
-            .join();
+    final var processInstance = createProcessInstance(signUpForm);
 
     // when
 
@@ -207,6 +182,16 @@ class ProcessIntegrationTests {
 
     // verify mock invocations
     verify(backendService).sendRejection(signUpForm, rejectionReason);
+  }
+
+  private ProcessInstanceEvent createProcessInstance(final SignUpForm signUpForm) {
+    return client
+        .newCreateInstanceCommand()
+        .bpmnProcessId(PROCESS_ID)
+        .latestVersion()
+        .variable("signUpForm", signUpForm)
+        .send()
+        .join();
   }
 
   private void mockJobWorker(final String jobType) {
