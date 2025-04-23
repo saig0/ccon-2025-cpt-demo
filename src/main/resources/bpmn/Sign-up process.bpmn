@@ -96,7 +96,7 @@
     </bpmn:endEvent>
     <bpmn:serviceTask id="send-rejection" name="Send rejection">
       <bpmn:extensionElements>
-        <zeebe:taskDefinition type="backend:reject-account" />
+        <zeebe:taskDefinition type="backend:reject-sign-up" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0tit8gl</bpmn:incoming>
       <bpmn:outgoing>Flow_0su5tbs</bpmn:outgoing>
@@ -109,6 +109,11 @@
       <bpmn:outgoing>Flow_10flto0</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:boundaryEvent id="error-invalid-account" name="Invalid" attachedToRef="create-account">
+      <bpmn:extensionElements>
+        <zeebe:ioMapping>
+          <zeebe:output source="=rejectionReason" target="rejectionReason" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
       <bpmn:outgoing>Flow_0tit8gl</bpmn:outgoing>
       <bpmn:errorEventDefinition id="ErrorEventDefinition_1dty0xb" />
     </bpmn:boundaryEvent>

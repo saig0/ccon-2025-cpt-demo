@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import io.camunda.client.CamundaClient;
 import io.camunda.demo.model.Account;
+import io.camunda.demo.model.AccountServiceException;
 import io.camunda.demo.model.SignUpForm;
 import io.camunda.demo.services.AccountService;
 import io.camunda.demo.services.BackendService;
@@ -63,7 +64,8 @@ class ProcessIntegrationTests {
             byName("New sign-up"),
             byName("Create account"),
             byName("Send activation email"),
-            byName("Send confirmation"));
+            byName("Send confirmation"))
+        .hasVariable("account", account);
 
     client
         .newPublishMessageCommand()
@@ -173,6 +175,38 @@ class ProcessIntegrationTests {
 
     // verify mock invocations
     verify(accountService).deleteAccount(account);
+  }
+
+  @DisplayName("Should reject sign-up if email address is already in use")
+  @Test
+  void shouldRejectSignUp() {
+    // given
+    final var signUpForm = new SignUpForm("Demo", "demo@camunda.com", true);
+
+    final String rejectionReason = "Email address is already used by a different account";
+    doThrow(new AccountServiceException(rejectionReason))
+        .when(accountService)
+        .createAccount(signUpForm);
+
+    final var processInstance =
+        client
+            .newCreateInstanceCommand()
+            .bpmnProcessId("sign-up")
+            .latestVersion()
+            .variable("signUpForm", signUpForm)
+            .send()
+            .join();
+
+    // when
+
+    // then
+    assertThat(processInstance)
+        .isCompleted()
+        .hasTerminatedElements(byName("Create account"))
+        .hasCompletedElements(byName("Send rejection"), byName("Sign-up rejected"));
+
+    // verify mock invocations
+    verify(backendService).sendRejection(signUpForm, rejectionReason);
   }
 
   private void mockJobWorker(final String jobType) {
