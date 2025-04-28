@@ -1,0 +1,8 @@
+// @timeout 5 m
+POST http://localhost:8080/process-tests/execute
+Accept: application/json
+Content-Type: application/json
+
+< cpt-dsl-demo-request.json
+
+###
