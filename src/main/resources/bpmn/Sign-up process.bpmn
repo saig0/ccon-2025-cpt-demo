@@ -3,15 +3,23 @@
   <bpmn:process id="sign-up" name="Sign-up process" isExecutable="true">
     <bpmn:extensionElements>
       <zeebe:properties>
-        <zeebe:property name="camundaModeler:exampleOutputJson" value="{&#34;signUpForm&#34;:{&#34;userName&#34;:&#34;Demo&#34;, &#34;email&#34;:&#34;demo@camunda.com&#34;, &#34;subscribeToNewsletter&#34;:true}, &#10;&#34;account&#34;: {&#34;id&#34;:&#34;i-1&#34;,&#34;userName&#34;:&#34;Demo&#34;, &#34;email&#34;:&#34;demo@camunda.com&#34;,&#34;subscribeToNewsletter&#34;:true, &#34;activationCode&#34;:&#34;code-1&#34;}}" />
+        <zeebe:property name="camundaModeler:exampleOutputJson" value="{&#34;signUpForm&#34;:{&#34;userName&#34;:&#34;Demo&#34;, &#34;email&#34;:&#34;demo@camunda.com&#34;, &#34;subscribeToNewsletter&#34;:true}, &#10;&#34;account&#34;: {&#10;    &#34;id&#34;: &#34;account-id-0001&#34;,&#10;    &#34;userName&#34;: &#34;Demo&#34;,&#10;    &#34;email&#34;: &#34;demo@camunda.com&#34;,&#10;    &#34;subscribeToNewsletter&#34;: true,&#10;    &#34;activationCode&#34;: &#34;activation-code-0001&#34;&#10;  }}" />
       </zeebe:properties>
     </bpmn:extensionElements>
     <bpmn:startEvent id="new-sign-up" name="New sign-up">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="camundaModeler:exampleOutputJson" value="{&#34;signUpForm&#34;:{&#34;userName&#34;:&#34;Demo&#34;, &#34;email&#34;:&#34;demo@camunda.com&#34;, &#34;subscribeToNewsletter&#34;:true}}" />
+        </zeebe:properties>
+      </bpmn:extensionElements>
       <bpmn:outgoing>Flow_11c441k</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:serviceTask id="create-account" name="Create account">
       <bpmn:extensionElements>
         <zeebe:taskDefinition type="accounts:create" />
+        <zeebe:properties>
+          <zeebe:property name="camundaModeler:exampleOutputJson" value="{&#10;  &#34;account&#34;: {&#10;    &#34;id&#34;: &#34;account-id-0001&#34;,&#10;    &#34;userName&#34;: &#34;Demo&#34;,&#10;    &#34;email&#34;: &#34;demo@camunda.com&#34;,&#10;    &#34;subscribeToNewsletter&#34;: true,&#10;    &#34;activationCode&#34;: &#34;activation-code-0001&#34;&#10;  }&#10;}" />
+        </zeebe:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_11c441k</bpmn:incoming>
       <bpmn:outgoing>Flow_18dxxx3</bpmn:outgoing>
@@ -156,17 +164,8 @@
       <bpmndi:BPMNShape id="Activity_0o5civ3_di" bpmnElement="send-activation-email">
         <dc:Bounds x="360" y="148" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1l8zemh_di" bpmnElement="send-rejection">
-        <dc:Bounds x="360" y="270" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1hkslz1_di" bpmnElement="send-confirmation">
         <dc:Bounds x="490" y="148" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1044m13_di" bpmnElement="sign-up-rejected">
-        <dc:Bounds x="522" y="292" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="500" y="335" width="81" height="14" />
-        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1ya5xfn_di" bpmnElement="await-email-activation">
         <dc:Bounds x="625" y="163" width="50" height="50" />
@@ -180,26 +179,14 @@
           <dc:Bounds x="681" y="213" width="79" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1cy9gmc_di" bpmnElement="timer-three-days">
-        <dc:Bounds x="702" y="282" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="704" y="325" width="33" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0z77csc_di" bpmnElement="activate-account">
         <dc:Bounds x="770" y="148" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1y8wbig_di" bpmnElement="delete-account">
-        <dc:Bounds x="770" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1c3noxs_di" bpmnElement="Gateway_1c3noxs" isMarkerVisible="true">
         <dc:Bounds x="895" y="163" width="50" height="50" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="892" y="220" width="56" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0tzm4u4_di" bpmnElement="subscribe-to-newsletter">
-        <dc:Bounds x="980" y="148" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_15us96j_di" bpmnElement="Gateway_15us96j" isMarkerVisible="true">
         <dc:Bounds x="1115" y="163" width="50" height="50" />
@@ -210,11 +197,32 @@
           <dc:Bounds x="1180" y="213" width="80" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1cy9gmc_di" bpmnElement="timer-three-days">
+        <dc:Bounds x="702" y="282" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="704" y="325" width="33" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1y8wbig_di" bpmnElement="delete-account">
+        <dc:Bounds x="770" y="260" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1rv05n1_di" bpmnElement="account-deleted">
         <dc:Bounds x="942" y="282" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="921" y="325" width="79" height="14" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1044m13_di" bpmnElement="sign-up-rejected">
+        <dc:Bounds x="522" y="292" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="500" y="335" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1l8zemh_di" bpmnElement="send-rejection">
+        <dc:Bounds x="360" y="270" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0tzm4u4_di" bpmnElement="subscribe-to-newsletter">
+        <dc:Bounds x="980" y="148" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1ad72r8_di" bpmnElement="error-invalid-account">
         <dc:Bounds x="302" y="210" width="36" height="36" />
