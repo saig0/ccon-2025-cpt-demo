@@ -1,0 +1,9 @@
+{
+  "account": {
+    "id": "account-id-0001",
+    "userName": "Demo",
+    "email": "demo@camunda.com",
+    "subscribeToNewsletter": true,
+    "activationCode": "activation-code-0001"
+  }
+}

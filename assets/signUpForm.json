@@ -1,0 +1,7 @@
+{
+  "signUpForm": {
+    "userName": "Demo",
+    "email": "demo@camunda.com",
+    "subscribeToNewsletter": true
+  }
+}
