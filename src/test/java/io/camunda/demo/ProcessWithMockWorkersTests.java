@@ -9,8 +9,8 @@ import io.camunda.demo.model.Account;
 import io.camunda.demo.model.SignUpForm;
 import io.camunda.process.test.api.CamundaProcessTestContext;
 import io.camunda.process.test.api.CamundaSpringProcessTest;
-import java.util.Collections;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,14 @@ class ProcessWithMockWorkersTests {
   @Autowired private CamundaClient client;
   @Autowired private CamundaProcessTestContext processTestContext;
 
+  @BeforeEach
+  void configureMocks() {
+    processTestContext.mockJobWorker("io.camunda:sendgrid:1").thenComplete();
+    processTestContext.mockJobWorker("backend:confirm-account").thenComplete();
+    processTestContext.mockJobWorker("accounts:activate").thenComplete();
+    processTestContext.mockJobWorker("subscriptions:subscribe").thenComplete();
+  }
+
   @DisplayName("Should create account and subscribe to newsletter")
   @Test
   void shouldCreateAccountWithSubscription() {
@@ -41,11 +49,7 @@ class ProcessWithMockWorkersTests {
     final var signUpForm = new SignUpForm(USER_NAME, EMAIL, true);
     final var account = new Account(ACCOUNT_ID, USER_NAME, EMAIL, true, ACTIVATION_CODE);
 
-    mockJobWorker("accounts:create", Map.of("account", account));
-    mockJobWorker("io.camunda:sendgrid:1");
-    mockJobWorker("backend:confirm-account");
-    mockJobWorker("accounts:activate");
-    mockJobWorker("subscriptions:subscribe");
+    processTestContext.mockJobWorker("accounts:create").thenComplete(Map.of("account", account));
 
     final var processInstance = createProcessInstance(signUpForm);
 
@@ -84,19 +88,5 @@ class ProcessWithMockWorkersTests {
         .variable("signUpForm", signUpForm)
         .send()
         .join();
-  }
-
-  private void mockJobWorker(final String jobType) {
-    mockJobWorker(jobType, Collections.emptyMap());
-  }
-
-  private void mockJobWorker(final String jobType, final Map<String, Object> variables) {
-    client
-        .newWorker()
-        .jobType(jobType)
-        .handler(
-            (jobClient, job) ->
-                jobClient.newCompleteCommand(job.getKey()).variables(variables).send())
-        .open();
   }
 }
