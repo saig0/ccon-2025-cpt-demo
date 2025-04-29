@@ -7,7 +7,7 @@ import io.camunda.demo.model.SignUpForm;
 import io.camunda.demo.services.AccountService;
 import io.camunda.spring.client.annotation.JobWorker;
 import io.camunda.spring.client.annotation.Variable;
-import io.camunda.spring.client.exception.CamundaBpmnError;
+import io.camunda.spring.client.exception.BpmnError;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
@@ -29,8 +29,11 @@ public class CreateAccountWorker {
       return Map.of("account", account);
 
     } catch (final AccountServiceException failure) {
-      throw new CamundaBpmnError(
-          "invalid", failure.getMessage(), Map.of("rejectionReason", failure.getMessage()));
+      throw new BpmnError(
+          "invalid",
+          failure.getMessage(),
+          Map.of("rejectionReason", failure.getMessage()),
+          failure);
     }
   }
 }
