@@ -19,6 +19,8 @@ Demo application with Camunda Process Test (CPT) for CCon 2025.
     - With mock
       services: [ProcessWithMockServicesTests.java](src/test/java/io/camunda/demo/ProcessWithMockServicesTests.java)
     - With Connectors: [ProcessWithConnectorsTests.java](src/test/java/io/camunda/demo/ProcessWithConnectorsTests.java)
+    - With application
+      services: [ProcessIntegrationTests.java](src/test/java/io/camunda/demo/ProcessIntegrationTests.java)
 
 ## Resources
 
