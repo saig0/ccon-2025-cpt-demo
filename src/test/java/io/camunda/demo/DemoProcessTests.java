@@ -8,6 +8,7 @@ import io.camunda.demo.services.BackendService;
 import io.camunda.demo.services.SubscriptionService;
 import io.camunda.process.test.api.CamundaProcessTestContext;
 import io.camunda.process.test.api.CamundaSpringProcessTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,28 @@ class DemoProcessTests {
   @MockitoBean private AccountService accountService;
   @MockitoBean private BackendService backendService;
   @MockitoBean private SubscriptionService subscriptionService;
+
+  // Sign-up process (id: "sign-up")
+  // |- New sign-up (id: "new-sign-up")
+  // |--- Create account (id: "create-account")
+  // |--- Send activation email (id: "send-activation-email")
+  // |--- Send confirmation (id: "send-confirmation")
+  // |--- Await email activation (id: "await-email-activation")
+  // |--- (message) Email confirmed (id: "message-email-confirmed")
+  // |--- Activate account (id: "activate-account")
+  // |--- Subscribe to newsletter (id: "subscribe-to-newsletter")
+  // |--- Account created (id: "account-created")
+  // |- (timer) 3 days (id: "timer-three-days")
+  // |--- Delete account (id: "delete-account")
+  // |--- Account deleted (id: "account-deleted")
+  // |- (error) Invalid (id: "error-invalid-account")
+  // |--- Send rejection (id: "send-rejection")
+  // |--- Sign-up rejected (id: "sign-up-rejected")
+
+  @BeforeEach
+  void configureMocks() {
+    // mocking
+  }
 
   @DisplayName("Should create account and subscribe to newsletter")
   @Test
