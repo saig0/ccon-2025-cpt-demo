@@ -15,6 +15,7 @@ import io.camunda.demo.services.SubscriptionService;
 import io.camunda.process.test.api.CamundaProcessTestContext;
 import io.camunda.process.test.api.CamundaSpringProcessTest;
 import java.time.Duration;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,11 @@ class ProcessWithMockServicesTests {
   @MockitoBean private BackendService backendService;
   @MockitoBean private SubscriptionService subscriptionService;
 
+  @BeforeEach
+  void configureMocks() {
+    processTestContext.mockJobWorker("io.camunda:sendgrid:1").thenComplete();
+  }
+
   @DisplayName("Should create account and subscribe to newsletter")
   @Test
   void shouldCreateAccountWithSubscription() {
@@ -47,7 +53,6 @@ class ProcessWithMockServicesTests {
     final var account = new Account(ACCOUNT_ID, USER_NAME, EMAIL, true, ACTIVATION_CODE);
 
     when(accountService.createAccount(signUpForm)).thenReturn(account);
-    mockJobWorker("io.camunda:sendgrid:1");
 
     final var processInstance = createProcessInstance(signUpForm);
 
@@ -93,7 +98,6 @@ class ProcessWithMockServicesTests {
     final var account = new Account(ACCOUNT_ID, USER_NAME, EMAIL, false, ACTIVATION_CODE);
 
     when(accountService.createAccount(signUpForm)).thenReturn(account);
-    mockJobWorker("io.camunda:sendgrid:1");
 
     final var processInstance = createProcessInstance(signUpForm);
 
@@ -125,7 +129,6 @@ class ProcessWithMockServicesTests {
     final var account = new Account(ACCOUNT_ID, USER_NAME, EMAIL, true, ACTIVATION_CODE);
 
     when(accountService.createAccount(signUpForm)).thenReturn(account);
-    mockJobWorker("io.camunda:sendgrid:1");
 
     final var processInstance = createProcessInstance(signUpForm);
 
@@ -176,13 +179,5 @@ class ProcessWithMockServicesTests {
         .variable("signUpForm", signUpForm)
         .send()
         .join();
-  }
-
-  private void mockJobWorker(final String jobType) {
-    client
-        .newWorker()
-        .jobType(jobType)
-        .handler((jobClient, job) -> jobClient.newCompleteCommand(job.getKey()).send())
-        .open();
   }
 }
