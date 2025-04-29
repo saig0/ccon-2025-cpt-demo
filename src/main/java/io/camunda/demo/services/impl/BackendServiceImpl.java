@@ -14,7 +14,7 @@ public class BackendServiceImpl implements BackendService {
 
   @Override
   public void confirmAccount(final Account account) {
-    LOG.info("Account confirmed. [id:{}]", account.id());
+    LOG.info("Account confirmed. [id: {}]", account.id());
   }
 
   @Override

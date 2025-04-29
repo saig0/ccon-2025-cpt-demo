@@ -13,6 +13,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
   @Override
   public void subscribeAccount(final Account account) {
-    LOG.info("Account subscribed. [id:{}]", account.id());
+    LOG.info("Account subscribed. [id: {}]", account.id());
   }
 }

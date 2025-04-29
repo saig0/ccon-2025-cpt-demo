@@ -19,7 +19,7 @@ public class AccountServiceImpl implements AccountService {
     final String accountId = UUID.randomUUID().toString();
     final String activationCode = UUID.randomUUID().toString();
 
-    LOG.debug("Account created. [id={}]", accountId);
+    LOG.info("Account created. [id: {}]", accountId);
 
     return new Account(
         accountId,
@@ -31,11 +31,11 @@ public class AccountServiceImpl implements AccountService {
 
   @Override
   public void activateAccount(final Account account) {
-    LOG.debug("Account activated. [id={}]", account.id());
+    LOG.info("Account activated. [id: {}]", account.id());
   }
 
   @Override
   public void deleteAccount(final Account account) {
-    LOG.debug("Account deleted. [id={}]", account.id());
+    LOG.info("Account deleted. [id: {}]", account.id());
   }
 }
