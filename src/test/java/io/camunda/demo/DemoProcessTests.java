@@ -22,6 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+// Process test of a SpringBoot application
+// ========================================
+// 1. Start the CPT runtime
+// 2. Start the process application, including the job workers
 @SpringBootTest
 @CamundaSpringProcessTest
 class DemoProcessTests {
@@ -39,6 +43,7 @@ class DemoProcessTests {
   @Autowired private CamundaClient client;
   @Autowired private CamundaProcessTestContext processTestContext;
 
+  // use Mockito to replace the services
   @MockitoBean private AccountService accountService;
   @MockitoBean private BackendService backendService;
   @MockitoBean private SubscriptionService subscriptionService;
@@ -63,6 +68,7 @@ class DemoProcessTests {
   @BeforeEach
   void configureMocks() {
     // mock services and job workers
+    // - mock SEND_GRID connector
   }
 
   @DisplayName("Should create account and subscribe to newsletter")
@@ -72,10 +78,15 @@ class DemoProcessTests {
     final var signUpForm = new SignUpForm(USER_NAME, EMAIL, true);
     final var account = new Account(ACCOUNT_ID, USER_NAME, EMAIL, true, ACTIVATION_CODE);
 
+    // - mock account service
+    // - create process instance with signUp variable
+
     // when
+    // - assert waiting on event-based gateway
+    // - publish message
 
     // then
-
+    // - verify completed elements
   }
 
   @DisplayName("Should delete account if no confirmation is received")
