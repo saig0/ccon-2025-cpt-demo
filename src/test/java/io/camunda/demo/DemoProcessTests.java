@@ -69,6 +69,7 @@ class DemoProcessTests {
   void configureMocks() {
     // mock services and job workers
     // - mock SEND_GRID connector
+
   }
 
   @DisplayName("Should create account and subscribe to newsletter")
@@ -87,7 +88,8 @@ class DemoProcessTests {
 
     // then
     // - assert completed elements:
-    // "create-account", "send-activation-email", "activate-account", "subscribe-to-newsletter
+    // "create-account", "send-activation-email", "activate-account", "subscribe-to-newsletter"
+
   }
 
   @DisplayName("Should delete account if no confirmation is received")
