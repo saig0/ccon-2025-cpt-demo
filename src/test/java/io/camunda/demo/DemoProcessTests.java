@@ -43,7 +43,7 @@ class DemoProcessTests {
   @Autowired private CamundaClient client;
   @Autowired private CamundaProcessTestContext processTestContext;
 
-  // use Mockito to replace the services
+  // use Mockito to replace the service implementations
   @MockitoBean private AccountService accountService;
   @MockitoBean private BackendService backendService;
   @MockitoBean private SubscriptionService subscriptionService;
@@ -82,11 +82,12 @@ class DemoProcessTests {
     // - create process instance with signUp variable
 
     // when
-    // - assert waiting on event-based gateway
+    // - assert waiting on event-based gateway: "await-email-activation"
     // - publish message
 
     // then
-    // - verify completed elements
+    // - assert completed elements:
+    // "create-account", "send-activation-email", "activate-account", "subscribe-to-newsletter
   }
 
   @DisplayName("Should delete account if no confirmation is received")
