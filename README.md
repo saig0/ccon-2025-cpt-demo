@@ -25,3 +25,4 @@ Demo application with Camunda Process Test (CPT) for CCon 2025.
 ## Resources
 
 - [Camunda 8 docs: Camunda Process Test](https://docs.camunda.io/docs/apis-tools/testing/getting-started/)
+- [Master Process Testing with Camunda Process Test CamundaCon talk](https://www.camundacon.com/event-session/camundacon-amsterdam-2025/master-process-testing-with-camunda-process-test/?on_demand=true)
