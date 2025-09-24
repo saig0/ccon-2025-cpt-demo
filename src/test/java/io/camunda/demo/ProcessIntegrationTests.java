@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-@SpringBootTest(properties = {"io.camunda.process.test.connectors-enabled=true"})
+@SpringBootTest(properties = {"camunda.process-test.connectors-enabled=true"})
 @TestPropertySource(locations = {"/connector-secrets.yml"})
 @CamundaSpringProcessTest
 class ProcessIntegrationTests {
