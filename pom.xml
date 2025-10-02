@@ -18,7 +18,8 @@
 
     <properties>
         <java.version>21</java.version>
-        <camunda.version>8.8.0-alpha8</camunda.version>
+        <camunda.version>8.8.0-rc2</camunda.version>
+        <connectors.version>8.8.0-alpha7</connectors.version>
     </properties>
 
     <dependencyManagement>
@@ -84,10 +85,267 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.4</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.1.2</version>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <phase>verify</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includes>
+                        <include>**/*IT.java</include>
+                    </includes>
+                    <skipITs>true</skipITs>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>integration-tests-camunda</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.8.1</version>
+                        <executions>
+                            <execution>
+                                <id>unpack-camunda</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>io.camunda</groupId>
+                                            <artifactId>camunda-zeebe</artifactId>
+                                            <version>${camunda.version}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>${project.build.directory}/c8run</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.6.0</version>
+                        <executions>
+                            <execution>
+                                <id>run-camunda</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>${project.build.directory}/c8run/camunda-zeebe-${camunda.version}/bin/camunda</executable>
+                                    <async>true</async>
+                                    <environmentVariables>
+                                        <SPRING_PROFILES_ACTIVE>broker,consolidated-auth,security</SPRING_PROFILES_ACTIVE>
+                                        <CAMUNDA_SECURITY_AUTHENTICATION_UNPROTECTEDAPI>true</CAMUNDA_SECURITY_AUTHENTICATION_UNPROTECTEDAPI>
+                                        <CAMUNDA_SECURITY_AUTHORIZATIONS_ENABLED>false</CAMUNDA_SECURITY_AUTHORIZATIONS_ENABLED>
+                                        <ZEEBE_CLOCK_CONTROLLED>true</ZEEBE_CLOCK_CONTROLLED>
+                                        <CAMUNDA_DATABASE_TYPE>rdbms</CAMUNDA_DATABASE_TYPE>
+                                        <CAMUNDA_DATA_SECONDARYSTORAGE_TYPE>rdbms</CAMUNDA_DATA_SECONDARYSTORAGE_TYPE>
+                                        <CAMUNDA_DATABASE_URL>jdbc:h2:mem:cpt;DB_CLOSE_DELAY=-1;MODE=PostgreSQL</CAMUNDA_DATABASE_URL>
+                                        <CAMUNDA_DATABASE_USERNAME>sa</CAMUNDA_DATABASE_USERNAME>
+                                        <CAMUNDA_DATABASE_PASSWORD></CAMUNDA_DATABASE_PASSWORD>
+                                        <ZEEBE_BROKER_EXPORTERS_RDBMS_CLASSNAME>io.camunda.exporter.rdbms.RdbmsExporter</ZEEBE_BROKER_EXPORTERS_RDBMS_CLASSNAME>
+                                        <ZEEBE_BROKER_EXPORTERS_RDBMS_ARGS_FLUSH_INTERVAL>PT0S</ZEEBE_BROKER_EXPORTERS_RDBMS_ARGS_FLUSH_INTERVAL>
+                                        <ZEEBE_BROKER_EXPORTERS_RDBMS_ARGS_DEFAULT_HISTORY_TTL>PT2S</ZEEBE_BROKER_EXPORTERS_RDBMS_ARGS_DEFAULT_HISTORY_TTL>
+                                    </environmentVariables>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>wait-for-camunda-ready</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>sleep</executable>
+                                    <arguments>
+                                        <argument>20</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/ProcessWithMockServicesIT.java</include>
+                            </includes>
+                            <skipITs>false</skipITs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>integration-tests-camunda-with-connectors</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.8.1</version>
+                        <executions>
+                            <execution>
+                                <id>get-connectors</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifact>io.camunda.connector:connector-runtime-bundle:${connectors.version}:jar:with-dependencies</artifact>
+                                    <outputDirectory>${project.build.directory}/c8run</outputDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>unpack-camunda</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>io.camunda</groupId>
+                                            <artifactId>camunda-zeebe</artifactId>
+                                            <version>${camunda.version}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>${project.build.directory}/c8run</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.6.0</version>
+                        <executions>
+                            <execution>
+                                <id>run-camunda</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>${project.build.directory}/c8run/camunda-zeebe-${camunda.version}/bin/camunda</executable>
+                                    <async>true</async>
+                                    <environmentVariables>
+                                        <SPRING_PROFILES_ACTIVE>broker,consolidated-auth,security</SPRING_PROFILES_ACTIVE>
+                                        <CAMUNDA_SECURITY_AUTHENTICATION_UNPROTECTEDAPI>true</CAMUNDA_SECURITY_AUTHENTICATION_UNPROTECTEDAPI>
+                                        <CAMUNDA_SECURITY_AUTHORIZATIONS_ENABLED>false</CAMUNDA_SECURITY_AUTHORIZATIONS_ENABLED>
+                                        <ZEEBE_CLOCK_CONTROLLED>true</ZEEBE_CLOCK_CONTROLLED>
+                                        <CAMUNDA_DATABASE_TYPE>rdbms</CAMUNDA_DATABASE_TYPE>
+                                        <CAMUNDA_DATA_SECONDARYSTORAGE_TYPE>rdbms</CAMUNDA_DATA_SECONDARYSTORAGE_TYPE>
+                                        <CAMUNDA_DATABASE_URL>jdbc:h2:mem:cpt;DB_CLOSE_DELAY=-1;MODE=PostgreSQL</CAMUNDA_DATABASE_URL>
+                                        <CAMUNDA_DATABASE_USERNAME>sa</CAMUNDA_DATABASE_USERNAME>
+                                        <CAMUNDA_DATABASE_PASSWORD></CAMUNDA_DATABASE_PASSWORD>
+                                        <ZEEBE_BROKER_EXPORTERS_RDBMS_CLASSNAME>io.camunda.exporter.rdbms.RdbmsExporter</ZEEBE_BROKER_EXPORTERS_RDBMS_CLASSNAME>
+                                        <ZEEBE_BROKER_EXPORTERS_RDBMS_ARGS_FLUSH_INTERVAL>PT0S</ZEEBE_BROKER_EXPORTERS_RDBMS_ARGS_FLUSH_INTERVAL>
+                                        <ZEEBE_BROKER_EXPORTERS_RDBMS_ARGS_DEFAULT_HISTORY_TTL>PT2S</ZEEBE_BROKER_EXPORTERS_RDBMS_ARGS_DEFAULT_HISTORY_TTL>
+                                    </environmentVariables>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>wait-for-camunda-ready</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>sleep</executable>
+                                    <arguments>
+                                        <argument>20</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>run-connectors</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>java</executable>
+                                    <async>true</async>
+                                    <arguments>
+                                        <argument>-Dserver.port=8085</argument>
+                                        <argument>-jar</argument>
+                                        <argument>${project.build.directory}/c8run/connector-runtime-bundle-${connectors.version}-with-dependencies.jar</argument>
+                                    </arguments>
+                                    <environmentVariables>
+                                        <SEND_GRID_API_KEY>MY_TOKEN</SEND_GRID_API_KEY>
+                                    </environmentVariables>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>wait-for-connectors-ready</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>sleep</executable>
+                                    <arguments>
+                                        <argument>20</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/ProcessWithConnectorsIT.java</include>
+                            </includes>
+                            <skipITs>false</skipITs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
