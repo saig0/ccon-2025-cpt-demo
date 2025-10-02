@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest(properties = "camunda.process-test.runtime-mode=remote")
 @CamundaSpringProcessTest
-class ProcessIT {
+class ProcessWithMockServicesIT {
 
   private static final String PROCESS_ID = "sign-up";
 
