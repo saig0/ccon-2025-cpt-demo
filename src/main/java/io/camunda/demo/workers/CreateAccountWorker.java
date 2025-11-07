@@ -5,9 +5,9 @@ import io.camunda.demo.model.Account;
 import io.camunda.demo.model.AccountServiceException;
 import io.camunda.demo.model.SignUpForm;
 import io.camunda.demo.services.AccountService;
-import io.camunda.spring.client.annotation.JobWorker;
-import io.camunda.spring.client.annotation.Variable;
-import io.camunda.spring.client.exception.BpmnError;
+import io.camunda.client.annotation.JobWorker;
+import io.camunda.client.annotation.Variable;
+import io.camunda.client.exception.BpmnError;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
