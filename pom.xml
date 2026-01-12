@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.4</version>
+        <version>4.0.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -18,19 +18,19 @@
 
     <properties>
         <java.version>21</java.version>
-        <camunda.version>8.8.0</camunda.version>
+        <camunda.version>8.8.9</camunda.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>io.camunda</groupId>
-                <artifactId>spring-boot-starter-camunda-sdk</artifactId>
+                <artifactId>camunda-spring-boot-4-starter</artifactId>
                 <version>${camunda.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.camunda</groupId>
-                <artifactId>camunda-process-test-spring</artifactId>
+                <artifactId>camunda-process-test-spring-4</artifactId>
                 <version>${camunda.version}</version>
             </dependency>
             <dependency>
@@ -51,7 +51,7 @@
 
         <dependency>
             <groupId>io.camunda</groupId>
-            <artifactId>spring-boot-starter-camunda-sdk</artifactId>
+            <artifactId>camunda-spring-boot-4-starter</artifactId>
         </dependency>
 
         <!-- testing (for process test) -->
@@ -63,7 +63,7 @@
 
         <dependency>
             <groupId>io.camunda</groupId>
-            <artifactId>camunda-process-test-spring</artifactId>
+            <artifactId>camunda-process-test-spring-4</artifactId>
             <scope>test</scope>
         </dependency>
 
