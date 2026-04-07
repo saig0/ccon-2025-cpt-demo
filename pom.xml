@@ -18,19 +18,19 @@
 
     <properties>
         <java.version>21</java.version>
-        <camunda.version>8.8.10-SNAPSHOT</camunda.version>
+        <camunda.version>8.9.0-rc4</camunda.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>io.camunda</groupId>
-                <artifactId>camunda-spring-boot-4-starter</artifactId>
+                <artifactId>camunda-spring-boot-starter</artifactId>
                 <version>${camunda.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.camunda</groupId>
-                <artifactId>camunda-process-test-spring-4</artifactId>
+                <artifactId>camunda-process-test-spring</artifactId>
                 <version>${camunda.version}</version>
             </dependency>
             <dependency>
@@ -51,7 +51,7 @@
 
         <dependency>
             <groupId>io.camunda</groupId>
-            <artifactId>camunda-spring-boot-4-starter</artifactId>
+            <artifactId>camunda-spring-boot-starter</artifactId>
         </dependency>
 
         <!-- testing (for process test) -->
@@ -63,7 +63,7 @@
 
         <dependency>
             <groupId>io.camunda</groupId>
-            <artifactId>camunda-process-test-spring-4</artifactId>
+            <artifactId>camunda-process-test-spring</artifactId>
             <scope>test</scope>
         </dependency>
 
