@@ -29,7 +29,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 // 2. Start the process application, including the job workers
 @SpringBootTest
 @CamundaSpringProcessTest
-@Disabled
+@Disabled("Enable for live coding")
 class DemoProcessTests {
 
   private static final String USER_NAME = "Demo";
