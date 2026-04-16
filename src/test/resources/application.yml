@@ -7,8 +7,8 @@ logging:
     root: warn
     io:
       camunda:
-      process:
-      test: info
+        process:
+          test: info
     # Hide default logging from Testcontainers
     org:
       testcontainers: warn
